@@ -5,16 +5,16 @@ import com.codeborne.selenide.Configuration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-
 import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selenide.*;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.open;
 
 public class StudentRegistrationFormTest {
 
     String additionalUrl = "/automation-practice-form", firstName = "Auto", lastName = "Test",
             email = "example@example.com", gender = "Male", phone = "1111111111", subject = "Computer Science",
-            hobbies = "Sports", filePath = "src/test/resources/pic.png", address = "Autotest address";
+            hobbies = "Sports", fileName = "pic.png", address = "Autotest address", birthMonth = "March",
+            birthYear = "1993", birthDay = "25", state = "NCR", city = "Delhi";
 
     @BeforeAll
     static void beforeAll() {
@@ -26,43 +26,35 @@ public class StudentRegistrationFormTest {
     @Test
     void studentRegistrationFormTest() {
         open(additionalUrl);
-        fillAndSubmitStudentInfo();
-        checkStudentInfo();
-    }
-
-    private void fillAndSubmitStudentInfo() {
         $("#firstName").setValue(firstName);
         $("#lastName").setValue(lastName);
         $("#userEmail").setValue(email);
         $("#genterWrapper").$(byText(gender)).click();
         $("#userNumber").setValue(phone);
         $("#dateOfBirthInput").click();
-        $(".react-datepicker__month-select [value=\"2\"]").click();
-        $(".react-datepicker__year-select [value=\"1993\"]").click();
-        $(".react-datepicker__month [aria-label=\"Choose Thursday, March 25th, 1993\"]").click();
+        $(".react-datepicker__month-select").selectOption(birthMonth);
+        $(".react-datepicker__year-select").selectOption(birthYear);
+        $(".react-datepicker__day--0" + birthDay + ":not(.react-datepicker__day--outside-month)").click();
         $("#subjectsWrapper #subjectsContainer #subjectsInput").sendKeys(subject);
         $("#subjectsWrapper #subjectsContainer .subjects-auto-complete__option:first-of-type").click();
         $("#hobbiesWrapper").$(byText(hobbies)).click();
-        $("#uploadPicture").uploadFile(new File(filePath));
+        $("#uploadPicture").uploadFromClasspath(fileName);
         $("#currentAddress").setValue(address);
         $("#stateCity-wrapper #state").click();
-        $("#stateCity-wrapper #state #react-select-3-option-0").click();
+        $("#stateCity-wrapper #state ").$(byText(state)).click();
         $("#stateCity-wrapper #city").click();
-        $("#stateCity-wrapper #city #react-select-4-option-0").click();
+        $("#stateCity-wrapper #city").$(byText(city)).click();
         $("#submit").click();
+        $(".table-responsive").$(byText("Student Name")).parent().shouldHave(Condition.text(firstName + " " + lastName));
+        $(".table-responsive").$(byText("Student Email")).parent().shouldHave(Condition.text(email));
+        $(".table-responsive").$(byText("Gender")).parent().shouldHave(Condition.text(gender));
+        $(".table-responsive").$(byText("Mobile")).parent().shouldHave(Condition.text(phone));
+        $(".table-responsive").$(byText("Date of Birth")).parent().shouldHave(Condition.text(birthDay + " " + birthMonth + "," + birthYear));
+        $(".table-responsive").$(byText("Subjects")).parent().shouldHave(Condition.text(subject));
+        $(".table-responsive").$(byText("Hobbies")).parent().shouldHave(Condition.text(hobbies));
+        $(".table-responsive").$(byText("Picture")).parent().shouldHave(Condition.text(fileName));
+        $(".table-responsive").$(byText("Address")).parent().shouldHave(Condition.text(address));
+        $(".table-responsive").$(byText("State and City")).parent().shouldHave(Condition.text(state + " " + city));
     }
 
-    private void checkStudentInfo() {
-        $(".table-responsive tbody tr:nth-of-type(1)").shouldHave(Condition.text(firstName + " " + lastName));
-        $(".table-responsive tbody tr:nth-of-type(2)").shouldHave(Condition.text(email));
-        $(".table-responsive tbody tr:nth-of-type(3)").shouldHave(Condition.text(gender));
-        $(".table-responsive tbody tr:nth-of-type(4)").shouldHave(Condition.text(phone));
-        $(".table-responsive tbody tr:nth-of-type(5)").shouldHave(Condition.text("25 March,1993"));
-        $(".table-responsive tbody tr:nth-of-type(6)").shouldHave(Condition.text(subject));
-        $(".table-responsive tbody tr:nth-of-type(7)").shouldHave(Condition.text(hobbies));
-        $(".table-responsive tbody tr:nth-of-type(8)").shouldHave(Condition.text(
-                filePath.substring(filePath.lastIndexOf('/') + 1)));
-        $(".table-responsive tbody tr:nth-of-type(9)").shouldHave(Condition.text(address));
-        $(".table-responsive tbody tr:nth-of-type(10)").shouldHave(Condition.text("NCR Delhi"));
-    }
 }
