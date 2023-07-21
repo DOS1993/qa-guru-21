@@ -26,6 +26,11 @@ public class StudentRegistrationFormTest {
     @Test
     void studentRegistrationFormTest() {
         open(additionalUrl);
+        fillStudentInfo();
+        checkStudentInfo();
+    }
+
+    private void fillStudentInfo() {
         $("#firstName").setValue(firstName);
         $("#lastName").setValue(lastName);
         $("#userEmail").setValue(email);
@@ -45,6 +50,9 @@ public class StudentRegistrationFormTest {
         $("#stateCity-wrapper #city").click();
         $("#stateCity-wrapper #city").$(byText(city)).click();
         $("#submit").click();
+    }
+
+    private void checkStudentInfo() {
         $(".table-responsive").$(byText("Student Name")).parent().shouldHave(Condition.text(firstName + " " + lastName));
         $(".table-responsive").$(byText("Student Email")).parent().shouldHave(Condition.text(email));
         $(".table-responsive").$(byText("Gender")).parent().shouldHave(Condition.text(gender));
