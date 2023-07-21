@@ -26,6 +26,10 @@ public class StudentRegistrationFormTest {
     @Test
     void studentRegistrationFormTest() {
         open(additionalUrl);
+        fillAndCheckStudentInfo();
+    }
+
+    private void fillAndCheckStudentInfo() {
         $("#firstName").setValue(firstName);
         $("#lastName").setValue(lastName);
         $("#userEmail").setValue(email);
